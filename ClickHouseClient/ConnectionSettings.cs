@@ -10,10 +10,12 @@ namespace ClickHouseClient
         public string User { get; set; } = "default";
         public string Password { get; set; }
         public string Database { get; set; } = "default";
+        public int Timeout { get; set; } = 1000 * 10;
 
         public ConnectionSettings(string connectionString)
         {
-            Parse(connectionString);
+            if (!string.IsNullOrWhiteSpace(connectionString))
+                Parse(connectionString);
         }
 
         public override string ToString()
@@ -25,6 +27,7 @@ namespace ClickHouseClient
             if (!string.IsNullOrEmpty(Password))
                 PropertyToString(sb, "Password", Password);
             PropertyToString(sb, "Database", Database);
+            PropertyToString(sb, "Timeout", Timeout);
             return sb.ToString();
         }
 
@@ -108,6 +111,9 @@ namespace ClickHouseClient
                     if (string.IsNullOrEmpty(rawValue))
                         throw new ConnectionStringException("Empty database is not allowed");
                     Database = rawValue;
+                    break;
+                case "timeout":
+                    Timeout = ToInt(key, rawValue);
                     break;
                 default:
                     throw new ConnectionStringException($"Unexpected key: {key}");

@@ -2,6 +2,7 @@ using NUnit.Framework;
 
 namespace ClickHouseClient.Test
 {
+    [TestFixture]
     public class ConnectionSettingsTest
     {
         [TestCase("Host=localhost;Port=9000")]
@@ -47,7 +48,7 @@ namespace ClickHouseClient.Test
         public void ToString_SimpleString()
         {
             var settings = new ConnectionSettings("Host=localhost;Port=9000");
-            Assert.AreEqual("Host=localhost;Port=9000;User=default;Database=default;", settings.ToString());
+            Assert.AreEqual("Host=localhost;Port=9000;User=default;Database=default;Timeout=10000;", settings.ToString());
         }
     }
 }
