@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.329
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickHouseClient", "ClickHouseClient\ClickHouseClient.csproj", "{B509258C-94E0-468B-ABAE-488AC055037A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickHouseClient.Test", "ClickHouseClient.Test\ClickHouseClient.Test.csproj", "{C9A660FB-12D2-46D4-836D-EB8CCAC98EAC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B509258C-94E0-468B-ABAE-488AC055037A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B509258C-94E0-468B-ABAE-488AC055037A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B509258C-94E0-468B-ABAE-488AC055037A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B509258C-94E0-468B-ABAE-488AC055037A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9A660FB-12D2-46D4-836D-EB8CCAC98EAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9A660FB-12D2-46D4-836D-EB8CCAC98EAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9A660FB-12D2-46D4-836D-EB8CCAC98EAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9A660FB-12D2-46D4-836D-EB8CCAC98EAC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A973B22B-AB80-4109-8969-F462EC816DC1}
+	EndGlobalSection
+EndGlobal
