@@ -43,8 +43,7 @@ namespace ClickHouseClient
             if (IsOpen())
                 throw new InvalidOperationException("Connection is open");
             _state = ConnectionState.Connecting;
-            _tcpClient = new TcpClient();
-            _tcpClient.ReceiveTimeout = _tcpClient.SendTimeout = _connectionSettings.Timeout;
+            _tcpClient = CreateTcpClient();
             try
             {
                 _tcpClient.Connect(_connectionSettings.Host, _connectionSettings.Port);
@@ -62,8 +61,7 @@ namespace ClickHouseClient
             if (IsOpen())
                 throw new InvalidOperationException("Connection is open");
             _state = ConnectionState.Connecting;
-            _tcpClient = new TcpClient();
-            _tcpClient.ReceiveTimeout = _tcpClient.SendTimeout = _connectionSettings.Timeout;
+            _tcpClient = CreateTcpClient();
             try
             {
                 await _tcpClient.ConnectAsync(_connectionSettings.Host, _connectionSettings.Port);
@@ -100,6 +98,13 @@ namespace ClickHouseClient
         public override void ChangeDatabase(string databaseName)
         {
             _connectionSettings.Database = !string.IsNullOrWhiteSpace(databaseName) ? databaseName.Trim() : "default";
+        }
+
+        private TcpClient CreateTcpClient()
+        {
+            var tcpClient = new TcpClient();
+            tcpClient.ReceiveTimeout = tcpClient.SendTimeout = _connectionSettings.Timeout;
+            return tcpClient;
         }
 
         private bool IsOpen()
