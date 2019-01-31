@@ -10,8 +10,9 @@ namespace ClickHouseClient
     {
         private ConnectionSettings _connectionSettings;
         private ConnectionState _state;
-        private IProtocol _protocol;
         private ServerInfo _serverInfo;
+
+        internal IProtocol Protocol { get; private set; }
 
         public override string ConnectionString
         {
@@ -43,11 +44,11 @@ namespace ClickHouseClient
             if (IsOpen())
                 throw new InvalidOperationException("Connection is open");
             _state = ConnectionState.Connecting;
-            _protocol = ProtocolFactory.Instance.Create(_connectionSettings);
+            Protocol = ProtocolFactory.Instance.Create(_connectionSettings);
             try
             {
-                _protocol.Connect();
-                _serverInfo = _protocol.Handshake();
+                Protocol.Connect();
+                _serverInfo = Protocol.Handshake();
             }
             catch
             {
@@ -62,11 +63,11 @@ namespace ClickHouseClient
             if (IsOpen())
                 throw new InvalidOperationException("Connection is open");
             _state = ConnectionState.Connecting;
-            _protocol = ProtocolFactory.Instance.Create(_connectionSettings);
+            Protocol = ProtocolFactory.Instance.Create(_connectionSettings);
             try
             {
-                await _protocol.ConnectAsync(cancellationToken);
-                _serverInfo = await _protocol.HandshakeAsync(cancellationToken);
+                await Protocol.ConnectAsync(cancellationToken);
+                _serverInfo = await Protocol.HandshakeAsync(cancellationToken);
             }
             catch
             {
@@ -78,17 +79,17 @@ namespace ClickHouseClient
 
         public override void Close()
         {
-            if (_protocol != null)
+            if (Protocol != null)
             {
-                _protocol.Dispose();
-                _protocol = null;
+                Protocol.Dispose();
+                Protocol = null;
             }
             _state = ConnectionState.Closed;
         }
 
         protected override DbCommand CreateDbCommand()
         {
-            throw new NotImplementedException();
+            return new ClickHouseCommand(this);
         }
 
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)

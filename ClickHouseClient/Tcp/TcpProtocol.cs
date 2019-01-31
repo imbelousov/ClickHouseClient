@@ -13,12 +13,15 @@ namespace ClickHouseClient.Tcp
         private const int ClientVersionMinor = 1;
         private const int ClientRevision = 54140;
         private const int TimeZoneMinBuild = 54058;
+        private const int ClientInfoWithQueryMinBuild = 54032;
+        private const int QuotaKeyWithQueryMinBuild = 54060;
 
         private readonly ConnectionSettings _connectionSettings;
         private readonly TcpClient _tcpClient;
         private Stream _stream;
         private StreamReader _reader;
         private StreamWriter _writer;
+        private ServerInfo _serverInfo;
 
         public TcpProtocol(ConnectionSettings connectionSettings)
         {
@@ -64,6 +67,7 @@ namespace ClickHouseClient.Tcp
                     info.Build = (int) _reader.ReadInteger();
                     if (info.Build >= TimeZoneMinBuild)
                         info.TimeZone = _reader.ReadString();
+                    _serverInfo = info;
                     return info;
                 case ServerMessageCode.Exception:
                     throw _reader.ReadException();
@@ -93,6 +97,7 @@ namespace ClickHouseClient.Tcp
                     info.Build = (int) await _reader.ReadIntegerAsync(cancellationToken);
                     if (info.Build >= TimeZoneMinBuild)
                         info.TimeZone = await _reader.ReadStringAsync(cancellationToken);
+                    _serverInfo = info;
                     return info;
                 case ServerMessageCode.Exception:
                     throw await _reader.ReadExceptionAsync(cancellationToken);
@@ -100,6 +105,39 @@ namespace ClickHouseClient.Tcp
                     throw new TcpProtocolException("Unexpected response");
             }
         }
+
+        public void SendQuery(string query)
+        {
+            _writer.WriteInteger(ClientMessageCode.Query);
+            _writer.WriteInteger(0);
+            if (_serverInfo.Build >= ClientInfoWithQueryMinBuild)
+            {
+                _writer.WriteByte(1);
+                _writer.WriteInteger(0);
+                _writer.WriteInteger(0);
+                _writer.WriteString(GetClientAddress());
+                _writer.WriteByte(1);
+                _writer.WriteString(GetOsUser());
+                _writer.WriteString(GetComputerName());
+                _writer.WriteString(ClientName);
+                _writer.WriteInteger(ClientVersionMajor);
+                _writer.WriteInteger(ClientVersionMinor);
+                _writer.WriteInteger(ClientRevision);
+            }
+            if (_serverInfo.Build >= QuotaKeyWithQueryMinBuild)
+                _writer.WriteInteger(0);
+            _writer.WriteInteger(0);
+            _writer.WriteInteger(2);
+            _writer.WriteInteger(0);
+            _writer.WriteString(query);
+            _stream.Flush();
+        }
+
+        private string GetClientAddress() => _tcpClient.Client.RemoteEndPoint.ToString();
+
+        private string GetOsUser() => Environment.UserName;
+
+        private string GetComputerName() => Environment.MachineName;
 
         public void Dispose()
         {

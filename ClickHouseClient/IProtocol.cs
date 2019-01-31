@@ -13,5 +13,7 @@ namespace ClickHouseClient
         ServerInfo Handshake();
 
         Task<ServerInfo> HandshakeAsync(CancellationToken cancellationToken);
+
+        void SendQuery(string query);
     }
 }

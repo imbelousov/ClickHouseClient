@@ -7,18 +7,36 @@ namespace ClickHouseClient
 {
     public class ClickHouseCommand : DbCommand
     {
+        private ClickHouseConnection _connection;
+
         public override string CommandText { get; set; }
         public override int CommandTimeout { get; set; }
         public override CommandType CommandType { get; set; }
         public override UpdateRowSource UpdatedRowSource { get; set; }
-        protected override DbConnection DbConnection { get; set; }
+
+        protected override DbConnection DbConnection
+        {
+            get => _connection;
+            set => _connection = (ClickHouseConnection) value;
+        }
+
         protected override DbParameterCollection DbParameterCollection { get; }
         protected override DbTransaction DbTransaction { get; set; }
         public override bool DesignTimeVisible { get; set; }
 
+        public ClickHouseCommand()
+        {
+        }
+
+        public ClickHouseCommand(ClickHouseConnection connection)
+        {
+            _connection = connection;
+        }
+
         public override int ExecuteNonQuery()
         {
-            throw new System.NotImplementedException();
+            _connection.Protocol.SendQuery(CommandText);
+            return 0;
         }
 
         public override Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)

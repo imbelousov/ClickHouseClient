@@ -79,6 +79,22 @@ namespace ClickHouseClient.Tcp
             await WriteAsync(buffer, 0, buffer.Length, cancellationToken);
         }
 
+        public void WriteByte(byte b)
+        {
+            var buffer = _bufferPool.Rent(1);
+            buffer[0] = b;
+            Write(buffer, 0, 1);
+            _bufferPool.Return(buffer);
+        }
+
+        public async Task WriteByteAsync(byte b, CancellationToken cancellationToken)
+        {
+            var buffer = _bufferPool.Rent(1);
+            buffer[0] = b;
+            await WriteAsync(buffer, 0, 1, cancellationToken);
+            _bufferPool.Return(buffer);
+        }
+
         public void Write(byte[] buffer, int offset, int count)
         {
             _stream.Write(buffer, offset, count);
