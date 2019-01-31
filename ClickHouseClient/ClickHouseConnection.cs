@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +10,8 @@ namespace ClickHouseClient
     {
         private ConnectionSettings _connectionSettings;
         private ConnectionState _state;
-        private TcpClient _tcpClient;
+        private IProtocol _protocol;
+        private ServerInfo _serverInfo;
 
         public override string ConnectionString
         {
@@ -25,7 +25,7 @@ namespace ClickHouseClient
 
         public override string DataSource => _connectionSettings.Host;
 
-        public override string ServerVersion { get; }
+        public override string ServerVersion => _serverInfo != null ? $"{_serverInfo.Name} {_serverInfo.VersionMajor}.{_serverInfo.VersionMinor}.{_serverInfo.Build}" : null;
 
         public ClickHouseConnection()
             : this(null)
@@ -43,10 +43,11 @@ namespace ClickHouseClient
             if (IsOpen())
                 throw new InvalidOperationException("Connection is open");
             _state = ConnectionState.Connecting;
-            _tcpClient = CreateTcpClient();
+            _protocol = ProtocolFactory.Instance.Create(_connectionSettings);
             try
             {
-                _tcpClient.Connect(_connectionSettings.Host, _connectionSettings.Port);
+                _protocol.Connect();
+                _serverInfo = _protocol.Handshake();
             }
             catch
             {
@@ -61,10 +62,11 @@ namespace ClickHouseClient
             if (IsOpen())
                 throw new InvalidOperationException("Connection is open");
             _state = ConnectionState.Connecting;
-            _tcpClient = CreateTcpClient();
+            _protocol = ProtocolFactory.Instance.Create(_connectionSettings);
             try
             {
-                await _tcpClient.ConnectAsync(_connectionSettings.Host, _connectionSettings.Port);
+                await _protocol.ConnectAsync(cancellationToken);
+                _serverInfo = await _protocol.HandshakeAsync(cancellationToken);
             }
             catch
             {
@@ -76,18 +78,17 @@ namespace ClickHouseClient
 
         public override void Close()
         {
-            if (_tcpClient != null)
+            if (_protocol != null)
             {
-                _tcpClient.Close();
-                _tcpClient.Dispose();
-                _tcpClient = null;
+                _protocol.Dispose();
+                _protocol = null;
             }
             _state = ConnectionState.Closed;
         }
 
         protected override DbCommand CreateDbCommand()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
@@ -98,13 +99,6 @@ namespace ClickHouseClient
         public override void ChangeDatabase(string databaseName)
         {
             _connectionSettings.Database = !string.IsNullOrWhiteSpace(databaseName) ? databaseName.Trim() : "default";
-        }
-
-        private TcpClient CreateTcpClient()
-        {
-            var tcpClient = new TcpClient();
-            tcpClient.ReceiveTimeout = tcpClient.SendTimeout = _connectionSettings.Timeout;
-            return tcpClient;
         }
 
         private bool IsOpen()

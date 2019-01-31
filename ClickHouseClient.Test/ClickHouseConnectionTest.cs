@@ -26,5 +26,23 @@ namespace ClickHouseClient.Test
             connection.Close();
             Assert.AreEqual(ConnectionState.Closed, connection.State);
         }
+
+        [Test]
+        public void Handshake()
+        {
+            var connection = new ClickHouseConnection();
+            connection.Open();
+            Assert.That(!string.IsNullOrEmpty(connection.ServerVersion));
+            connection.Close();
+        }
+
+        [Test]
+        public async Task HandshakeAsync()
+        {
+            var connection = new ClickHouseConnection();
+            await connection.OpenAsync();
+            Assert.That(!string.IsNullOrEmpty(connection.ServerVersion));
+            connection.Close();
+        }
     }
 }
