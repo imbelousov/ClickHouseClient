@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -93,6 +94,18 @@ namespace ClickHouseClient.Tcp
             buffer[0] = b;
             await WriteAsync(buffer, 0, 1, cancellationToken);
             _bufferPool.Return(buffer);
+        }
+
+        public void WriteInt32(int integer)
+        {
+            var buffer = BitConverter.GetBytes(integer);
+            Write(buffer, 0, buffer.Length);
+        }
+
+        public Task WriteInt32Async(int integer, CancellationToken cancellationToken)
+        {
+            var buffer = BitConverter.GetBytes(integer);
+            return WriteAsync(buffer, 0, buffer.Length, cancellationToken);
         }
 
         public void Write(byte[] buffer, int offset, int count)

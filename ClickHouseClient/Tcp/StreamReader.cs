@@ -99,7 +99,7 @@ namespace ClickHouseClient.Tcp
             return b;
         }
 
-        public Exception ReadException()
+        public ClickHouseException ReadException()
         {
             var code = ReadInt32();
             var name = ReadString();
@@ -112,7 +112,7 @@ namespace ClickHouseClient.Tcp
             return new ClickHouseException(code, name, message, stackTrace, innerException);
         }
 
-        public async Task<Exception> ReadExceptionAsync(CancellationToken cancellationToken)
+        public async Task<ClickHouseException> ReadExceptionAsync(CancellationToken cancellationToken)
         {
             var code = await ReadInt32Async(cancellationToken);
             var name = await ReadStringAsync(cancellationToken);
