@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace ClickHouseClient.Tcp.Data
 {
-    internal class IntegerArray : DataArray
+    internal class NumberArray : DataArray
     {
         private Array _data;
 
@@ -36,6 +36,12 @@ namespace ClickHouseClient.Tcp.Data
                     break;
                 case "UInt64":
                     Read<ulong>(reader, rowCount, 8);
+                    break;
+                case "Float32":
+                    Read<float>(reader, rowCount, 4);
+                    break;
+                case "Float64":
+                    Read<double>(reader, rowCount, 8);
                     break;
             }
         }

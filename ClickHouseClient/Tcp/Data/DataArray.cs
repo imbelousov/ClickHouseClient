@@ -21,8 +21,8 @@
             DataArray array;
             if (type.StartsWith("Nullable("))
                 array = new NullableArray();
-            else if (IsInteger(type))
-                array = new IntegerArray();
+            else if (IsNumber(type))
+                array = new NumberArray();
             else
                 throw new TcpProtocolException($"Unexpected column type: {type}");
             array.Count = rowCount;
@@ -32,9 +32,11 @@
 
         protected abstract void ReadImpl(StreamReader reader, string type, int rowCount);
 
-        private static bool IsInteger(string type)
+        private static bool IsNumber(string type)
         {
-            return type == "Int8" || type == "Int16" || type == "Int32" || type == "Int64" || type == "UInt8" || type == "UInt16" || type == "UInt32" || type == "UInt64";
+            return type == "Int8" || type == "Int16" || type == "Int32" || type == "Int64" ||
+                   type == "UInt8" || type == "UInt16" || type == "UInt32" || type == "UInt64" ||
+                   type == "Float32" || type == "Float64";
         }
     }
 }
