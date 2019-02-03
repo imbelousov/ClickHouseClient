@@ -23,6 +23,10 @@
                 array = new NullableArray();
             else if (IsNumber(type))
                 array = new NumberArray();
+            else if (type == "String")
+                array = new StringArray();
+            else if (type == "Nothing")
+                array = new NothingArray();
             else
                 throw new TcpProtocolException($"Unexpected column type: {type}");
             array.Count = rowCount;
