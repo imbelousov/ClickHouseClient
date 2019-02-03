@@ -27,6 +27,8 @@
                 array = new StringArray();
             else if (type == "UUID")
                 array = new UuidArray();
+            else if (type.StartsWith("Array("))
+                array = new ArrayArray();
             else if (type == "Nothing")
                 array = new NothingArray();
             else

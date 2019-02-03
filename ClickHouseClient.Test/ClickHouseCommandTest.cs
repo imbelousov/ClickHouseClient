@@ -131,19 +131,17 @@ namespace ClickHouseClient.Test
         public void ExecuteDbDataReader_SelectMultipleNullable()
         {
             _command.CommandText = @"
-                select * from (
-                    select cast(1 as Nullable(Int32)) as x
-                    union all
-                    select cast(2 as Nullable(Int32))
-                    union all
-                    select cast(null as Nullable(Int32))
-                    union all
-                    select cast(4 as Nullable(Int32))
-                    union all
-                    select cast(null as Nullable(Int32))
-                    union all
-                    select cast(6 as Nullable(Int32))
-                )
+                select cast(1 as Nullable(Int32)) as x
+                union all
+                select cast(2 as Nullable(Int32))
+                union all
+                select cast(null as Nullable(Int32))
+                union all
+                select cast(4 as Nullable(Int32))
+                union all
+                select cast(null as Nullable(Int32))
+                union all
+                select cast(6 as Nullable(Int32))
             ";
             var actual = ReadSingleColumn<int?>();
             CollectionAssert.AreEqual(new int?[] {1, 2, null, 4, null, 6}, actual);
@@ -156,6 +154,51 @@ namespace ClickHouseClient.Test
             _command.CommandText = $"select cast('{expected}' as UUID)";
             var actual = ReadSingleColumn<Guid>().Single();
             Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExecuteDbDataReader_Array()
+        {
+            var expected = new object[] {1, 2, 3, 10};
+            _command.CommandText = $"select [{string.Join(", ", expected)}]";
+            var actual = ReadSingleColumn<object[]>().Single();
+            CollectionAssert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ExecuteDbDataReader_Arrays()
+        {
+            var expected1 = new object[] {1, 2, 3, 10};
+            var expected2 = new object[] {3, 5};
+            var expected3 = new object[] { };
+            var expected4 = new object[] {-1, 5, 3};
+            _command.CommandText = $@"
+                select [{string.Join(", ", expected1)}] as x
+                union all
+                select [{string.Join(", ", expected2)}]
+                union all
+                select [{string.Join(", ", expected3)}]
+                union all
+                select [{string.Join(", ", expected4)}]
+            ";
+            var actual = ReadSingleColumn<object[]>();
+            CollectionAssert.AreEqual(expected1, actual[0]);
+            CollectionAssert.AreEqual(expected2, actual[1]);
+            CollectionAssert.AreEqual(expected3, actual[2]);
+            CollectionAssert.AreEqual(expected4, actual[3]);
+        }
+
+        [Test]
+        public void ExecuteDbDataReader_InnerArrays()
+        {
+            var expected1 = new object[] {1, 2, 3, 10};
+            var expected2 = new object[] {3, 5};
+            _command.CommandText = $@"
+                select [[{string.Join(", ", expected1)}], [{string.Join(", ", expected2)}]]
+            ";
+            var actual = ReadSingleColumn<object[]>().Single();
+            CollectionAssert.AreEqual(expected1, (object[]) actual[0]);
+            CollectionAssert.AreEqual(expected2, (object[]) actual[1]);
         }
 
         private List<T> ReadSingleColumn<T>()

@@ -11,8 +11,13 @@
         {
             _nulls = new byte[rowCount];
             reader.Read(_nulls, 0, _nulls.Length);
-            var innerType = type.Substring(9, type.Length - 10);
+            var innerType = GetInnerType(type);
             _innerArray = Read(reader, innerType, rowCount);
+        }
+
+        private string GetInnerType(string type)
+        {
+            return type.Substring(9, type.Length - 10);
         }
     }
 }
