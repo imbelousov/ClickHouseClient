@@ -3,13 +3,39 @@ using System.Text;
 
 namespace ClickHouseClient
 {
+    /// <summary>
+    /// Represents a parsed connection string
+    /// </summary>
     internal class ConnectionSettings
     {
+        /// <summary>
+        /// Gets or sets a DNS name or an IP address of the server
+        /// </summary>
         public string Host { get; set; } = "localhost";
+
+        /// <summary>
+        /// Gets or sets a port
+        /// </summary>
         public int Port { get; set; } = 9000;
+
+        /// <summary>
+        /// Gets or sets a user
+        /// </summary>
         public string User { get; set; } = "default";
+
+        /// <summary>
+        /// Gets or sets a password
+        /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Gets or sets a default database
+        /// </summary>
         public string Database { get; set; } = "default";
+
+        /// <summary>
+        /// Gets or sets a connection timeout
+        /// </summary>
         public int Timeout { get; set; } = 1000 * 10;
 
         public ConnectionSettings(string connectionString)

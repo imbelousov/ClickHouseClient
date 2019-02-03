@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ClickHouseClient.Tcp.Columns;
+using ClickHouseClient.Tcp.Data;
 
 namespace ClickHouseClient.Tcp.ServerMessages
 {
@@ -34,7 +34,8 @@ namespace ClickHouseClient.Tcp.ServerMessages
             var columns = new List<Column>(columnCount);
             for (var i = 0; i < columnCount; i++)
             {
-                columns.Add(ReadColumn(reader, rowCount));
+                var column = ReadColumn(reader, rowCount);
+                columns.Add(column);
             }
             Block = new Block(columns, overflow, bucketNumber);
         }
@@ -43,9 +44,8 @@ namespace ClickHouseClient.Tcp.ServerMessages
         {
             var name = reader.ReadString();
             var type = reader.ReadString();
-            var column = Column.Create(name, type);
-            column.Read(reader, rowCount);
-            return column;
+            var data = DataArray.Read(reader, type, rowCount);
+            return new Column(name, type, data);
         }
     }
 }
