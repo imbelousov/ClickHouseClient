@@ -70,6 +70,10 @@ namespace ClickHouseClient.Test
                 yield return new TestCaseData("select cast(null as Nullable(String))", null);
                 yield return new TestCaseData("select null", null);
                 yield return new TestCaseData("select cast('d7ed2d6d-b404-449b-9469-0845ac4767b7' as UUID)", Guid.Parse("d7ed2d6d-b404-449b-9469-0845ac4767b7"));
+                yield return new TestCaseData("select cast('2015-06-01 12:30:00' as DateTime)", new DateTime(2015, 6, 1, 12, 30, 0));
+                yield return new TestCaseData("select cast(null as Nullable(DateTime))", null);
+                yield return new TestCaseData("select cast('2015-06-01' as Date)", new DateTime(2015, 6, 1, 0, 0, 0));
+                yield return new TestCaseData("select cast(null as Nullable(Date))", null);
             }
         }
 

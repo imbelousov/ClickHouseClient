@@ -25,8 +25,12 @@
                 array = new NumberArray();
             else if (type == "String")
                 array = new StringArray();
+            else if (type == "DateTime")
+                array = new DateTimeArray();
             else if (type == "UUID")
                 array = new UuidArray();
+            else if (type == "Date")
+                array = new DateArray();
             else if (type.StartsWith("Array("))
                 array = new ArrayArray();
             else if (type == "Nothing")
