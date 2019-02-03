@@ -25,56 +25,56 @@ namespace ClickHouseClient.Test
             _connection.Dispose();
         }
 
-        public static IEnumerable<string> SimpleSelectQueries
+        public static IEnumerable<TestCaseData> SimpleSelectQueries
         {
             get
             {
-                yield return "select cast(1 as Int8)";
-                yield return "select cast(-1 as Int8)";
-                yield return "select cast(1 as UInt8)";
-                yield return "select cast(1 as Nullable(UInt8))";
-                yield return "select cast(null as Nullable(UInt8))";
-                yield return "select cast(1 as Nullable(Int8))";
-                yield return "select cast(null as Nullable(Int8))";
-                yield return "select cast(1 as Int16)";
-                yield return "select cast(-1 as Int16)";
-                yield return "select cast(1 as UInt16)";
-                yield return "select cast(1 as Nullable(UInt16))";
-                yield return "select cast(null as Nullable(UInt16))";
-                yield return "select cast(1 as Nullable(Int16))";
-                yield return "select cast(null as Nullable(Int16))";
-                yield return "select cast(1 as Int32)";
-                yield return "select cast(-1 as Int32)";
-                yield return "select cast(1 as UInt32)";
-                yield return "select cast(1 as Nullable(UInt32))";
-                yield return "select cast(null as Nullable(UInt32))";
-                yield return "select cast(1 as Nullable(Int32))";
-                yield return "select cast(null as Nullable(Int32))";
-                yield return "select cast(1 as Int64)";
-                yield return "select cast(-1 as Int64)";
-                yield return "select cast(1 as UInt64)";
-                yield return "select cast(1 as Nullable(UInt64))";
-                yield return "select cast(null as Nullable(UInt64))";
-                yield return "select cast(1 as Nullable(Int64))";
-                yield return "select cast(null as Nullable(Int64))";
-                yield return "select cast(1 as Float32)";
-                yield return "select cast(-1.33 as Float32)";
-                yield return "select cast(1 as Nullable(Float32))";
-                yield return "select cast(null as Nullable(Float32))";
-                yield return "select cast(1 as Float64)";
-                yield return "select cast(-1.33 as Float64)";
-                yield return "select cast(1 as Nullable(Float64))";
-                yield return "select cast(null as Nullable(Float64))";
-                yield return "select cast('1' as String)";
-                yield return "select cast('1' as Nullable(String))";
-                yield return "select cast(null as Nullable(String))";
-                yield return "select null";
-                yield return "select generateUUIDv4()";
+                yield return new TestCaseData("select cast(1 as Int8)", (sbyte) 1);
+                yield return new TestCaseData("select cast(-1 as Int8)", (sbyte) -1);
+                yield return new TestCaseData("select cast(1 as UInt8)", (byte) 1);
+                yield return new TestCaseData("select cast(1 as Nullable(UInt8))", (byte?) 1);
+                yield return new TestCaseData("select cast(null as Nullable(UInt8))", null);
+                yield return new TestCaseData("select cast(1 as Nullable(Int8))", (sbyte?) 1);
+                yield return new TestCaseData("select cast(null as Nullable(Int8))", null);
+                yield return new TestCaseData("select cast(1 as Int16)", (short) 1);
+                yield return new TestCaseData("select cast(-1 as Int16)", (short) -1);
+                yield return new TestCaseData("select cast(1 as UInt16)", (ushort) 1);
+                yield return new TestCaseData("select cast(1 as Nullable(UInt16))", (ushort?) 1);
+                yield return new TestCaseData("select cast(null as Nullable(UInt16))", null);
+                yield return new TestCaseData("select cast(1 as Nullable(Int16))", (short?) 1);
+                yield return new TestCaseData("select cast(null as Nullable(Int16))", null);
+                yield return new TestCaseData("select cast(1 as Int32)", 1);
+                yield return new TestCaseData("select cast(-1 as Int32)", -1);
+                yield return new TestCaseData("select cast(1 as UInt32)", 1U);
+                yield return new TestCaseData("select cast(1 as Nullable(UInt32))", (uint?) 1);
+                yield return new TestCaseData("select cast(null as Nullable(UInt32))", null);
+                yield return new TestCaseData("select cast(1 as Nullable(Int32))", (int?) 1);
+                yield return new TestCaseData("select cast(null as Nullable(Int32))", null);
+                yield return new TestCaseData("select cast(1 as Int64)", 1L);
+                yield return new TestCaseData("select cast(-1 as Int64)", -1L);
+                yield return new TestCaseData("select cast(1 as UInt64)", 1UL);
+                yield return new TestCaseData("select cast(1 as Nullable(UInt64))", (ulong?) 1UL);
+                yield return new TestCaseData("select cast(null as Nullable(UInt64))", null);
+                yield return new TestCaseData("select cast(1 as Nullable(Int64))", (long?) 1L);
+                yield return new TestCaseData("select cast(null as Nullable(Int64))", null);
+                yield return new TestCaseData("select cast(1 as Float32)", 1.0f);
+                yield return new TestCaseData("select cast(-1.33 as Float32)", -1.33f);
+                yield return new TestCaseData("select cast(1 as Nullable(Float32))", (float?) 1.0f);
+                yield return new TestCaseData("select cast(null as Nullable(Float32))", null);
+                yield return new TestCaseData("select cast(1 as Float64)", 1.0);
+                yield return new TestCaseData("select cast(-1.33 as Float64)", -1.33);
+                yield return new TestCaseData("select cast(1 as Nullable(Float64))", (double?) 1);
+                yield return new TestCaseData("select cast(null as Nullable(Float64))", null);
+                yield return new TestCaseData("select cast('1' as String)", "1");
+                yield return new TestCaseData("select cast('1' as Nullable(String))", "1");
+                yield return new TestCaseData("select cast(null as Nullable(String))", null);
+                yield return new TestCaseData("select null", null);
+                yield return new TestCaseData("select cast('d7ed2d6d-b404-449b-9469-0845ac4767b7' as UUID)", Guid.Parse("d7ed2d6d-b404-449b-9469-0845ac4767b7"));
             }
         }
 
         [TestCaseSource(nameof(SimpleSelectQueries))]
-        public void ExecuteNonQuery_SimpleSelect(string sql)
+        public void ExecuteNonQuery_SimpleSelect(string sql, object expected)
         {
             _command.CommandText = sql;
             _command.ExecuteNonQuery();
@@ -116,15 +116,16 @@ namespace ClickHouseClient.Test
         }
 
         [TestCaseSource(nameof(SimpleSelectQueries))]
-        public void ExecuteDbDataReader_SimpleSelect(string sql)
+        public void ExecuteDbDataReader_SimpleSelect(string sql, object expected)
         {
             _command.CommandText = sql;
             var reader = _command.ExecuteReader();
             var first = reader.Read();
-            var value = reader.GetValue(0);
+            var actual = reader.GetValue(0);
             var second = reader.Read();
             Assert.IsTrue(first);
             Assert.IsFalse(second);
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -145,15 +146,6 @@ namespace ClickHouseClient.Test
             ";
             var actual = ReadSingleColumn<int?>();
             CollectionAssert.AreEqual(new int?[] {1, 2, null, 4, null, 6}, actual);
-        }
-
-        [Test]
-        public void ExecuteDbDataReader_Uuid()
-        {
-            var expected = Guid.NewGuid();
-            _command.CommandText = $"select cast('{expected}' as UUID)";
-            var actual = ReadSingleColumn<Guid>().Single();
-            Assert.AreEqual(expected, actual);
         }
 
         [Test]
