@@ -44,24 +44,6 @@ namespace ClickHouseClient.Tcp
             return integer;
         }
 
-        public short ReadInt16()
-        {
-            var buffer = _bufferPool.Rent(2);
-            Read(buffer, 0, 2);
-            var result = BitConverter.ToInt16(buffer, 0);
-            _bufferPool.Return(buffer);
-            return result;
-        }
-
-        public async Task<short> ReadInt16Async(CancellationToken cancellationToken)
-        {
-            var buffer = _bufferPool.Rent(2);
-            await ReadAsync(buffer, 0, 2, cancellationToken);
-            var result = BitConverter.ToInt16(buffer, 0);
-            _bufferPool.Return(buffer);
-            return result;
-        }
-
         public int ReadInt32()
         {
             var buffer = _bufferPool.Rent(4);
@@ -76,24 +58,6 @@ namespace ClickHouseClient.Tcp
             var buffer = _bufferPool.Rent(4);
             await ReadAsync(buffer, 0, 4, cancellationToken);
             var result = BitConverter.ToInt32(buffer, 0);
-            _bufferPool.Return(buffer);
-            return result;
-        }
-
-        public long ReadInt64()
-        {
-            var buffer = _bufferPool.Rent(8);
-            Read(buffer, 0, 8);
-            var result = BitConverter.ToInt64(buffer, 8);
-            _bufferPool.Return(buffer);
-            return result;
-        }
-
-        public async Task<long> ReadInt64Async(CancellationToken cancellationToken)
-        {
-            var buffer = _bufferPool.Rent(8);
-            await ReadAsync(buffer, 0, 8, cancellationToken);
-            var result = BitConverter.ToInt64(buffer, 8);
             _bufferPool.Return(buffer);
             return result;
         }

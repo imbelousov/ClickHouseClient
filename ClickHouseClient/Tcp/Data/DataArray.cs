@@ -33,6 +33,8 @@
                 array = new DateArray();
             else if (type.StartsWith("Array("))
                 array = new ArrayArray();
+            else if (IsEnum(type))
+                array = new EnumArray();
             else if (type == "Nothing")
                 array = new NothingArray();
             else
@@ -49,6 +51,11 @@
             return type == "Int8" || type == "Int16" || type == "Int32" || type == "Int64" ||
                    type == "UInt8" || type == "UInt16" || type == "UInt32" || type == "UInt64" ||
                    type == "Float32" || type == "Float64";
+        }
+
+        private static bool IsEnum(string type)
+        {
+            return type.StartsWith("Enum8(") || type.StartsWith("Enum16(");
         }
     }
 }

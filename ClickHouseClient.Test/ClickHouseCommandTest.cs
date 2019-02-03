@@ -197,6 +197,17 @@ namespace ClickHouseClient.Test
             CollectionAssert.AreEqual(expected2, (object[]) actual[1]);
         }
 
+        [Test]
+        public void ExecuteDbDataReader_Enum8()
+        {
+            ExecuteSystemSql("drop table if exists Enum8Test");
+            ExecuteSystemSql("create table Enum8Test (id Int32, e Enum8('abc' = 1, 'b' = 25, 'c' = -80)) engine MergeTree order by id");
+            ExecuteSystemSql("insert into Enum8Test (id, e) values (1, 'abc'), (2, 'b'), (3, 'abc'), (4, 'c')");
+            _command.CommandText = "select e from Enum8Test";
+            var actual = ReadSingleColumn<string>();
+            CollectionAssert.AreEqual(new[] {"a", "b", "a", "c"}, actual);
+        }
+
         private List<T> ReadSingleColumn<T>()
         {
             var reader = _command.ExecuteReader();
@@ -206,6 +217,16 @@ namespace ClickHouseClient.Test
                 result.Add((T) reader.GetValue(0));
             }
             return result;
+        }
+
+        private void ExecuteSystemSql(string sql)
+        {
+            _connection = new ClickHouseConnection();
+            _connection.Open();
+            var cmd = _connection.CreateCommand();
+            cmd.CommandText = sql;
+            cmd.ExecuteNonQuery();
+            _connection.Dispose();
         }
     }
 }
