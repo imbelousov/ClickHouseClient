@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace ClickHouseClient.Test
@@ -67,11 +69,12 @@ namespace ClickHouseClient.Test
                 yield return "select cast('1' as Nullable(String))";
                 yield return "select cast(null as Nullable(String))";
                 yield return "select null";
+                yield return "select generateUUIDv4()";
             }
         }
 
         [TestCaseSource(nameof(SimpleSelectQueries))]
-        public void ExecuteNonQuery_ColumnTypes(string sql)
+        public void ExecuteNonQuery_SimpleSelect(string sql)
         {
             _command.CommandText = sql;
             _command.ExecuteNonQuery();
@@ -92,7 +95,7 @@ namespace ClickHouseClient.Test
         }
 
         [Test]
-        public void ExecuteNonQuery_Nullable()
+        public void ExecuteNonQuery_SelectMultipleNullable()
         {
             _command.CommandText = @"
                 select * from (
@@ -113,7 +116,7 @@ namespace ClickHouseClient.Test
         }
 
         [TestCaseSource(nameof(SimpleSelectQueries))]
-        public void ExecuteDbDataReader_ColumnTypes(string sql)
+        public void ExecuteDbDataReader_SimpleSelect(string sql)
         {
             _command.CommandText = sql;
             var reader = _command.ExecuteReader();
@@ -122,6 +125,48 @@ namespace ClickHouseClient.Test
             var second = reader.Read();
             Assert.IsTrue(first);
             Assert.IsFalse(second);
+        }
+
+        [Test]
+        public void ExecuteDbDataReader_SelectMultipleNullable()
+        {
+            _command.CommandText = @"
+                select * from (
+                    select cast(1 as Nullable(Int32)) as x
+                    union all
+                    select cast(2 as Nullable(Int32))
+                    union all
+                    select cast(null as Nullable(Int32))
+                    union all
+                    select cast(4 as Nullable(Int32))
+                    union all
+                    select cast(null as Nullable(Int32))
+                    union all
+                    select cast(6 as Nullable(Int32))
+                )
+            ";
+            var actual = ReadSingleColumn<int?>();
+            CollectionAssert.AreEqual(new int?[] {1, 2, null, 4, null, 6}, actual);
+        }
+
+        [Test]
+        public void ExecuteDbDataReader_Uuid()
+        {
+            var expected = Guid.NewGuid();
+            _command.CommandText = $"select cast('{expected}' as UUID)";
+            var actual = ReadSingleColumn<Guid>().Single();
+            Assert.AreEqual(expected, actual);
+        }
+
+        private List<T> ReadSingleColumn<T>()
+        {
+            var reader = _command.ExecuteReader();
+            var result = new List<T>();
+            while (reader.Read())
+            {
+                result.Add((T) reader.GetValue(0));
+            }
+            return result;
         }
     }
 }

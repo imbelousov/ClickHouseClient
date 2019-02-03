@@ -157,18 +157,8 @@ namespace ClickHouseClient
                 _currentBatch = null;
             if (_currentBatch == null)
             {
-                while (true)
-                {
-                    _currentBatch = _connection.Protocol.ReadData();
-                    if (_currentBatch == null)
-                    {
-                        _isEof = true;
-                        return false;
-                    }
-                    if (_currentBatch.RowCount > 0)
-                        break;
-                }
-                _currentRow = -1;
+                if (!ReadBatch())
+                    return false;
             }
             _currentRow++;
             _recordsAffected++;
@@ -187,9 +177,21 @@ namespace ClickHouseClient
 
         internal void ReadSchema()
         {
-            _hasRows = Read();
+            _hasRows = ReadBatch();
+        }
+
+        private bool ReadBatch()
+        {
             _currentRow = -1;
-            _recordsAffected = 0;
+            while (!_isEof)
+            {
+                _currentBatch = _connection.Protocol.ReadData();
+                if (_currentBatch == null)
+                    _isEof = true;
+                else if (_currentBatch.RowCount > 0)
+                    return true;
+            }
+            return false;
         }
     }
 }

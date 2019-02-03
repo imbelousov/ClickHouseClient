@@ -25,6 +25,8 @@
                 array = new NumberArray();
             else if (type == "String")
                 array = new StringArray();
+            else if (type == "UUID")
+                array = new UuidArray();
             else if (type == "Nothing")
                 array = new NothingArray();
             else
