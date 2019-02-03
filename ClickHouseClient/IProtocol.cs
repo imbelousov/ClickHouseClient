@@ -36,5 +36,11 @@ namespace ClickHouseClient
         /// </summary>
         /// <param name="query">ClickHouse SQL query</param>
         void SendQuery(string query);
+
+        /// <summary>
+        /// Reads a batch of data as result of query execution and returns it
+        /// </summary>
+        /// <returns>Batch of data</returns>
+        IDataBatch ReadData();
     }
 }

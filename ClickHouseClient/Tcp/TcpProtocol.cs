@@ -65,11 +65,18 @@ namespace ClickHouseClient.Tcp
             WriteMessage(new QueryClientMessage(query, _tcpClient.Client.RemoteEndPoint));
             WriteMessage(new DataClientMessage(Block.Empty));
             _stream.Flush();
+        }
+
+        public IDataBatch ReadData()
+        {
             ServerMessage message;
             do
             {
                 message = ReadMessage();
-            } while (!(message is EndOfStreamServerMessage));
+            } while (!(message is EndOfStreamServerMessage || message is DataServerMessage));
+            if (message is DataServerMessage dataMessage)
+                return new TcpDataBatch(dataMessage.Block);
+            return null;
         }
 
         private void WriteMessage(ClientMessage message)

@@ -36,6 +36,9 @@ namespace ClickHouseClient
         public override int ExecuteNonQuery()
         {
             _connection.Protocol.SendQuery(CommandText);
+            while (_connection.Protocol.ReadData() != null)
+            {
+            }
             return 0;
         }
 
@@ -56,7 +59,10 @@ namespace ClickHouseClient
 
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
         {
-            throw new System.NotImplementedException();
+            _connection.Protocol.SendQuery(CommandText);
+            var reader = new ClickHouseDataReader(_connection);
+            reader.ReadSchema();
+            return reader;
         }
 
         protected override Task<DbDataReader> ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
