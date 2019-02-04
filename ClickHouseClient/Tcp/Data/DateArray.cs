@@ -5,7 +5,7 @@ namespace ClickHouseClient.Tcp.Data
 {
     internal class DateArray : DataArray
     {
-        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local);
 
         private ushort[] _data;
 

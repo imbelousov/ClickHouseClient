@@ -9,7 +9,7 @@ namespace ClickHouseClient.Tcp.Data
 
         private uint[] _data;
 
-        public override object this[int index] => UnixEpoch.AddMilliseconds(_data[index]);
+        public override object this[int index] => UnixEpoch.AddSeconds(_data[index]).ToLocalTime();
 
         protected override void ReadImpl(StreamReader reader, string type, int rowCount)
         {
